@@ -17,7 +17,7 @@ public class xdata {
         try {
             String token = getToken(
                     "ACCESS_KEY",
-                    "ACCESS_TOKEN"
+                    "ACCESS_SECRET"
             ).get("AccessToken").getAsString();
             System.out.println("token: " + token);
 
@@ -75,10 +75,10 @@ public class xdata {
         return result.data;
     }
 
-    private static JsonObject getToken(String accessKey, String accessToken) throws IOException {
+    private static JsonObject getToken(String accessKey, String accessSecret) throws IOException {
         return get(String.format(
                 baseURL + "/open/token?AccessKey=%s&AccessSecret=%s",
-                URLEncoder.encode(accessKey, "UTF-8"), URLEncoder.encode(accessToken, "UTF-8")), null).getAsJsonObject();
+                URLEncoder.encode(accessKey, "UTF-8"), URLEncoder.encode(accessSecret, "UTF-8")), null).getAsJsonObject();
     }
 
     private static String urlToStatic(String tmpURL, String token) throws IOException {

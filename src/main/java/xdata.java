@@ -11,7 +11,7 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 
 public class xdata {
-    private static String baseURL = "https://xdata.tuotoo.org/v1";
+    private static String baseURL = "https://api.xdata.tuotoo.com/v1";
 
     public static void main(String[] args) {
         try {

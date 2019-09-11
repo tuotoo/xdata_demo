@@ -48,7 +48,7 @@ public class xdata {
                 System.out.println("Cover: "+article.getAsJsonObject().get("Cover").getAsString());
             }
 
-            articles = getArticlesWithDate("中国移动", "2019-09-01T00:00:00Z","2019-09-10T00:00:00Z",token);
+            articles = getArticlesWithDate("中国移动", "2019-09-01T00:00:00+08:00","2019-09-10T00:00:00+08:00",token);
             for (JsonElement article : articles) {
                 System.out.println("Title: "+article.getAsJsonObject().get("Title").getAsString());
                 System.out.println("URL: "+article.getAsJsonObject().get("URL").getAsString());

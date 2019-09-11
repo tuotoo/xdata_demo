@@ -47,6 +47,20 @@ public class xdata {
                 System.out.println("Author: "+article.getAsJsonObject().get("Author").getAsString());
                 System.out.println("Cover: "+article.getAsJsonObject().get("Cover").getAsString());
             }
+
+            articles = getArticlesWithDate("中国移动", "2019-09-01T00:00:00Z","2019-09-10T00:00:00Z",token);
+            for (JsonElement article : articles) {
+                System.out.println("Title: "+article.getAsJsonObject().get("Title").getAsString());
+                System.out.println("URL: "+article.getAsJsonObject().get("URL").getAsString());
+                System.out.println("Datetime: "+article.getAsJsonObject().get("Datetime").getAsInt());
+                System.out.println("Author: "+article.getAsJsonObject().get("Author").getAsString());
+                System.out.println("Cover: "+article.getAsJsonObject().get("Cover").getAsString());
+            }
+
+            articles = searchArticles("中国移动",10,token);
+            for (JsonElement article : articles) {
+                System.out.println("Title: "+article.getAsJsonObject().get("title").getAsString());
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -99,10 +113,29 @@ public class xdata {
                 token).getAsJsonObject();
     }
 
-    private static JsonArray getArticles(String name, int count, String token) throws IOException {
+    private static JsonArray getArticles(String name, int fetchDepth, String token) throws IOException {
         return get(String.format(
-                baseURL + "/open/mp/articles?name=%s&count=%s",
+                baseURL + "/open/mp/articles?name=%s&fetchDepth=%s",
                 URLEncoder.encode(name, "UTF-8"),
+                URLEncoder.encode(Integer.toString(fetchDepth), "UTF-8")
+                ),
+                token).getAsJsonArray();
+    }
+
+    private static JsonArray getArticlesWithDate(String name, String start, String end, String token) throws IOException {
+        return get(String.format(
+                baseURL + "/open/mp/articles?name=%s&start=%s&end=%s",
+                URLEncoder.encode(name, "UTF-8"),
+                URLEncoder.encode(start, "UTF-8"),
+                URLEncoder.encode(end, "UTF-8")
+                ),
+                token).getAsJsonArray();
+    }
+
+    private static JsonArray searchArticles(String keyword, int count, String token) throws IOException {
+        return get(String.format(
+                baseURL + "/open/article/search?key=%s&count=%s",
+                URLEncoder.encode(keyword, "UTF-8"),
                 URLEncoder.encode(Integer.toString(count), "UTF-8")
                 ),
                 token).getAsJsonArray();

@@ -15,6 +15,8 @@ public class xdata {
 
     public static void main(String[] args) {
         try {
+            SslUtils.ignoreSsl();
+
             String token = getToken(
                     "ACCESS_KEY",
                     "ACCESS_SECRET"
@@ -61,7 +63,7 @@ public class xdata {
             for (JsonElement article : articles) {
                 System.out.println("Title: "+article.getAsJsonObject().get("title").getAsString());
             }
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }

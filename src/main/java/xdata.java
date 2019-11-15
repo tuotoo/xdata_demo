@@ -6,12 +6,15 @@ import com.google.gson.JsonObject;
 import javax.net.ssl.HttpsURLConnection;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Formatter;
 
 public class xdata {
-    private static String baseURL = "https://api.xdata.tuotoo.com/v1";
+    private static String baseURL = "https://api.xdata.tuotoo.com/v1/open";
 
     public static void main(String[] args) {
         try {
@@ -41,25 +44,25 @@ public class xdata {
 
             JsonArray articles = getArticles("中国移动", 10, token);
             for (JsonElement article : articles) {
-                System.out.println("Title: "+article.getAsJsonObject().get("Title").getAsString());
-                System.out.println("URL: "+article.getAsJsonObject().get("URL").getAsString());
-                System.out.println("Datetime: "+article.getAsJsonObject().get("Datetime").getAsInt());
-                System.out.println("Author: "+article.getAsJsonObject().get("Author").getAsString());
-                System.out.println("Cover: "+article.getAsJsonObject().get("Cover").getAsString());
+                System.out.println("Title: " + article.getAsJsonObject().get("Title").getAsString());
+                System.out.println("URL: " + article.getAsJsonObject().get("URL").getAsString());
+                System.out.println("Datetime: " + article.getAsJsonObject().get("Datetime").getAsInt());
+                System.out.println("Author: " + article.getAsJsonObject().get("Author").getAsString());
+                System.out.println("Cover: " + article.getAsJsonObject().get("Cover").getAsString());
             }
 
-            articles = getArticlesWithDate("中国移动", "2019-09-01T00:00:00+08:00","2019-09-10T00:00:00+08:00",token);
+            articles = getArticlesWithDate("中国移动", "2019-09-01T00:00:00+08:00", "2019-09-10T00:00:00+08:00", token);
             for (JsonElement article : articles) {
-                System.out.println("Title: "+article.getAsJsonObject().get("Title").getAsString());
-                System.out.println("URL: "+article.getAsJsonObject().get("URL").getAsString());
-                System.out.println("Datetime: "+article.getAsJsonObject().get("Datetime").getAsInt());
-                System.out.println("Author: "+article.getAsJsonObject().get("Author").getAsString());
-                System.out.println("Cover: "+article.getAsJsonObject().get("Cover").getAsString());
+                System.out.println("Title: " + article.getAsJsonObject().get("Title").getAsString());
+                System.out.println("URL: " + article.getAsJsonObject().get("URL").getAsString());
+                System.out.println("Datetime: " + article.getAsJsonObject().get("Datetime").getAsInt());
+                System.out.println("Author: " + article.getAsJsonObject().get("Author").getAsString());
+                System.out.println("Cover: " + article.getAsJsonObject().get("Cover").getAsString());
             }
 
-            articles = searchArticles("中国移动",10,token);
+            articles = searchArticles("中国移动", 10, token);
             for (JsonElement article : articles) {
-                System.out.println("Title: "+article.getAsJsonObject().get("title").getAsString());
+                System.out.println("Title: " + article.getAsJsonObject().get("title").getAsString());
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -89,55 +92,88 @@ public class xdata {
         return result.data;
     }
 
+    private static String URLFormat(String format, String... args) throws UnsupportedEncodingException {
+        ArrayList<Object> encodedArgs = new ArrayList<>();
+        for (String arg : args) {
+            encodedArgs.add(URLEncoder.encode(arg, "UTF-8"));
+        }
+        return new Formatter().format(format, encodedArgs.toArray()).toString();
+    }
+
     private static JsonObject getToken(String accessKey, String accessSecret) throws IOException {
-        return get(String.format(
-                baseURL + "/open/token?AccessKey=%s&AccessSecret=%s",
-                URLEncoder.encode(accessKey, "UTF-8"), URLEncoder.encode(accessSecret, "UTF-8")), null).getAsJsonObject();
+        return get(URLFormat(
+                baseURL + "/token?AccessKey=%s&AccessSecret=%s",
+                accessKey, accessSecret
+        ), null).getAsJsonObject();
     }
 
     private static String urlToStatic(String tmpURL, String token) throws IOException {
-        return get(String.format(
-                baseURL + "/open/url/static?url=%s", URLEncoder.encode(tmpURL, "UTF-8")),
+        return get(URLFormat(
+                baseURL + "/url/static?url=%s",
+                tmpURL),
                 token).getAsString();
     }
 
     private static JsonObject getReadLike(String url, String token) throws IOException {
-        return get(String.format(
-                baseURL + "/open/url/likes?url=%s", URLEncoder.encode(url, "UTF-8")),
+        return get(URLFormat(
+                baseURL + "/url/likes?url=%s",
+                url),
                 token).getAsJsonObject();
     }
 
     private static JsonObject getContent(String url, String token) throws IOException {
-        return get(String.format(
-                baseURL + "/open/article/content?url=%s", URLEncoder.encode(url, "UTF-8")),
-                token).getAsJsonObject();
+        return get(URLFormat(
+                baseURL + "/article/content?url=%s",
+                url
+        ), token).getAsJsonObject();
     }
 
     private static JsonArray getArticles(String name, int fetchDepth, String token) throws IOException {
-        return get(String.format(
-                baseURL + "/open/mp/articles?name=%s&fetchDepth=%s",
-                URLEncoder.encode(name, "UTF-8"),
-                URLEncoder.encode(Integer.toString(fetchDepth), "UTF-8")
-                ),
-                token).getAsJsonArray();
+        return get(URLFormat(
+                baseURL + "/mp/articles?name=%s&fetchDepth=%s",
+                name, Integer.toString(fetchDepth)
+        ), token).getAsJsonArray();
     }
 
     private static JsonArray getArticlesWithDate(String name, String start, String end, String token) throws IOException {
-        return get(String.format(
-                baseURL + "/open/mp/articles?name=%s&start=%s&end=%s",
-                URLEncoder.encode(name, "UTF-8"),
-                URLEncoder.encode(start, "UTF-8"),
-                URLEncoder.encode(end, "UTF-8")
-                ),
-                token).getAsJsonArray();
+        return get(URLFormat(
+                baseURL + "/mp/articles?name=%s&start=%s&end=%s",
+                name, start, end
+        ), token).getAsJsonArray();
     }
 
     private static JsonArray searchArticles(String keyword, int count, String token) throws IOException {
-        return get(String.format(
-                baseURL + "/open/article/search?key=%s&count=%s",
-                URLEncoder.encode(keyword, "UTF-8"),
-                URLEncoder.encode(Integer.toString(count), "UTF-8")
-                ),
-                token).getAsJsonArray();
+        return get(URLFormat(
+                baseURL + "/article/search?key=%s&count=%s",
+                keyword, Integer.toString(count)
+        ), token).getAsJsonArray();
+    }
+
+    private static JsonObject getMPHistory(String username, int offset, String start, String token) throws IOException {
+        return get(URLFormat(
+                baseURL + "/mp/history?name=%s&offset=%s&start=%s",
+                username, Integer.toString(offset), start
+        ), token).getAsJsonObject();
+    }
+
+    private static JsonObject searchArticlesByPage(String key, int page, String token) throws IOException {
+        return get(URLFormat(
+                baseURL + "/article/search/page?key=%s&page=%s",
+                key, Integer.toString(page)
+        ), token).getAsJsonObject();
+    }
+
+    private static JsonObject getMPInfo(String name, String token) throws IOException {
+        return get(URLFormat(
+                baseURL + "/mp/info?name=%s",
+                name
+        ), token).getAsJsonObject();
+    }
+
+    private static JsonObject searchMP(String key, int page, String token) throws IOException {
+        return get(URLFormat(
+                baseURL + "/mp/search?key=%s&page=%s",
+                key, Integer.toString(page)
+        ), token).getAsJsonObject();
     }
 }
